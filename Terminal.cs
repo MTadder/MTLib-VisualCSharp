@@ -1,0 +1,105 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+
+namespace MTLibrary {
+    public static class Terminal {
+        public static void TypeWrite(string msg, int maxInterval, ConsoleColor col = ConsoleColor.White) {
+            foreach (char c in msg.ToCharArray()) {
+                Put(c.ToString(), col);
+                if (!char.IsWhiteSpace(c)) {
+                    Thread.Sleep(RandomNumberGenerator.GetInt32(maxInterval));
+                }
+            }
+        }
+        public static void Write(string msg, ConsoleColor col = ConsoleColor.White) {
+            TypeWrite(msg, 2, col);
+        }
+        public static void Put(string msg, ConsoleColor col = ConsoleColor.White) {
+            ConsoleColor lastCol = Console.ForegroundColor;
+            Console.ForegroundColor = col;
+            Console.Write(msg);
+            Console.ForegroundColor = lastCol;
+        }
+        public class Menu {
+            #region Properties
+            public delegate void HookDelegate();
+            public string Title = string.Empty;
+            public string Description = string.Empty;
+            public string InvalidTriggerMsg = "Invalid operation.";
+            public string Carriage = ">: ";
+            public bool Locked = false;
+            public Dictionary<string, Menu> Triggers = new();
+            public Dictionary<string, HookDelegate> Hooks = new();
+            #endregion
+            #region Internals
+            internal Menu? LastMenu = null;
+            #endregion
+            #region Constructors
+            public Menu(string title, string description, bool isLocked = false) {
+                this.Title = title;
+                this.Description = description;
+                this.Locked = isLocked;
+            }
+            #endregion
+            #region Methods
+            public bool Prompt() {
+                Draw();
+                string? input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input)) { input = ""; }
+                if (this.Hooks.ContainsKey(input)) { this.Hooks[input].Invoke(); return true; }
+                if (this.Triggers.ContainsKey(input)) { StepForward(this.Triggers[input]); return true; }
+                if (input.Equals("/help")) {
+                    Write($"Commands?:\n");
+                    Write(GetHelp(), ConsoleColor.Gray);
+                    _ = Console.ReadLine();
+                    return true;
+                }
+                if (input.Equals("/b")) { StepBack(); return true; }
+                Write($"{this.InvalidTriggerMsg} Type [/b] to go back.", ConsoleColor.DarkRed);
+                Console.Beep();
+                Thread.Sleep(1000);
+                return false;
+            }
+            public void Draw() {
+                Console.Clear();
+                Write($"\t\t{this.Title}\n", ConsoleColor.Cyan);
+                Write($"{GetChoices()}\n", ConsoleColor.DarkGreen);
+                Write(this.Carriage, ConsoleColor.Green);
+            }
+            public String GetHelp() {
+                StringBuilder help = new();
+                foreach (KeyValuePair<string, HookDelegate> h in this.Hooks) {
+                    _ = help.AppendLine(h.Key);
+                }
+                return help.ToString();
+            }
+            public string GetChoices() {
+                StringBuilder choices = new();
+                foreach (KeyValuePair<string, Menu> t in this.Triggers) {
+                    if (!t.Value.Locked) {
+                        _ = choices.AppendLine($"[{t.Key}] -> {t.Value.Title} ({t.Value.Description})");
+                    }
+                }
+                return choices.ToString();
+            }
+            public void StepBack() {
+                if (this.LastMenu == null || this.Locked) { return; }
+                (this.Title, this.Description) = (this.LastMenu.Title, this.LastMenu.Description);
+                this.Hooks = this.LastMenu.Hooks;
+                (this.Triggers, this.LastMenu) = (this.LastMenu.Triggers, this.LastMenu.LastMenu);
+            }
+            public void StepForward(Menu nextMenu) {
+                if (this.Locked) { return; }
+                nextMenu.Locked = false;
+                this.LastMenu = (Menu) this.MemberwiseClone();
+                (this.Title, this.Description) = (nextMenu.Title, nextMenu.Description);
+                this.Triggers = nextMenu.Triggers;
+                this.Hooks = nextMenu.Hooks;
+            }
+            #endregion
+        }
+    }
+}

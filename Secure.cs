@@ -24,8 +24,7 @@ namespace MTLibrary {
                 String[] hashedKeys = new String[keys.Length];
                 for (Int32 i = 0; i < keys.Length; i++) {
                     hashedKeys[i] = this.Hash(keys[i]);
-                }
-                this._keyset.AddRange(hashedKeys);
+                } this._keyset.AddRange(hashedKeys);
             }
             public void Register(List<String> keys) {
                 this.Register(keys.ToArray());
