@@ -25,14 +25,13 @@ namespace MTLibrary {
         }
         public class Menu {
             #region Properties
-            public delegate void HookDelegate();
             public string Title = string.Empty;
             public string Description = string.Empty;
             public string InvalidTriggerMsg = "Invalid operation.";
             public string Carriage = ">: ";
             public bool Locked = false;
             public Dictionary<string, Menu> Triggers = new();
-            public Dictionary<string, HookDelegate> Hooks = new();
+            public Dictionary<string, Action> Actions = new();
             #endregion
             #region Internals
             internal Menu? LastMenu = null;
@@ -49,11 +48,12 @@ namespace MTLibrary {
                 Draw();
                 string? input = Console.ReadLine();
                 if (string.IsNullOrEmpty(input)) { input = ""; }
-                if (this.Hooks.ContainsKey(input)) { this.Hooks[input].Invoke(); return true; }
+                if (this.Actions.ContainsKey(input)) { this.Actions[input]?.Invoke(); return true; }
                 if (this.Triggers.ContainsKey(input)) { StepForward(this.Triggers[input]); return true; }
-                if (input.Equals("/help")) {
-                    Write($"Commands?:\n");
+                if (input.Equals("/help") || input.Equals("/?")) {
+                    Write($"Actions:");
                     Write(GetHelp(), ConsoleColor.Gray);
+                    Write("\nPress [ENTER] to continue.", ConsoleColor.Gray);
                     _ = Console.ReadLine();
                     return true;
                 }
@@ -71,8 +71,8 @@ namespace MTLibrary {
             }
             public String GetHelp() {
                 StringBuilder help = new();
-                foreach (KeyValuePair<string, HookDelegate> h in this.Hooks) {
-                    _ = help.AppendLine(h.Key);
+                foreach (KeyValuePair<string, Action> h in this.Actions) {
+                    _ = help.Append($"\n\t[{h.Key}]");
                 }
                 return help.ToString();
             }
@@ -88,7 +88,7 @@ namespace MTLibrary {
             public void StepBack() {
                 if (this.LastMenu == null || this.Locked) { return; }
                 (this.Title, this.Description) = (this.LastMenu.Title, this.LastMenu.Description);
-                this.Hooks = this.LastMenu.Hooks;
+                this.Actions = this.LastMenu.Actions;
                 (this.Triggers, this.LastMenu) = (this.LastMenu.Triggers, this.LastMenu.LastMenu);
             }
             public void StepForward(Menu nextMenu) {
@@ -97,7 +97,7 @@ namespace MTLibrary {
                 this.LastMenu = (Menu) this.MemberwiseClone();
                 (this.Title, this.Description) = (nextMenu.Title, nextMenu.Description);
                 this.Triggers = nextMenu.Triggers;
-                this.Hooks = nextMenu.Hooks;
+                this.Actions = nextMenu.Actions;
             }
             #endregion
         }
