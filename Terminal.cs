@@ -6,18 +6,18 @@ using System.Threading;
 
 namespace MTLibrary {
     public static class Terminal {
-        public static void TypeWrite(string msg, int maxInterval, ConsoleColor col = ConsoleColor.White) {
-            foreach (char c in msg.ToCharArray()) {
+        public static void TypeWrite(String msg, int maxInterval, ConsoleColor col = ConsoleColor.White) {
+            foreach (Char c in msg.ToCharArray()) {
                 Put(c.ToString(), col);
-                if (!char.IsWhiteSpace(c)) {
+                if (!Char.IsWhiteSpace(c)) {
                     Thread.Sleep(RandomNumberGenerator.GetInt32(maxInterval));
                 }
             }
         }
-        public static void Write(string msg, ConsoleColor col = ConsoleColor.White) {
+        public static void Write(String msg, ConsoleColor col = ConsoleColor.White) {
             TypeWrite(msg, 2, col);
         }
-        public static void Put(string msg, ConsoleColor col = ConsoleColor.White) {
+        public static void Put(String msg, ConsoleColor col = ConsoleColor.White) {
             ConsoleColor lastCol = Console.ForegroundColor;
             Console.ForegroundColor = col;
             Console.Write(msg);
@@ -25,19 +25,19 @@ namespace MTLibrary {
         }
         public class Menu {
             #region Properties
-            public string Title = string.Empty;
-            public string Description = string.Empty;
-            public string InvalidTriggerMsg = "Invalid operation.";
-            public string Carriage = ">: ";
-            public bool Locked = false;
-            public Dictionary<string, Menu> Triggers = new();
-            public Dictionary<string, Action> Actions = new();
+            public String Title = String.Empty;
+            public String Description = String.Empty;
+            public String InvalidTriggerMsg = "Invalid operation.";
+            public String Carriage = ">: ";
+            public Boolean Locked = false;
+            public Dictionary<String, Menu> Triggers = new();
+            public Dictionary<String, Action> Actions = new();
             #endregion
             #region Internals
             internal Menu? LastMenu = null;
             #endregion
             #region Constructors
-            public Menu(string title, string description, bool isLocked = false) {
+            public Menu(String title, String description, Boolean isLocked = false) {
                 this.Title = title;
                 this.Description = description;
                 this.Locked = isLocked;
@@ -46,8 +46,8 @@ namespace MTLibrary {
             #region Methods
             public bool Prompt() {
                 Draw();
-                string? input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input)) { input = ""; }
+                String? input = Console.ReadLine();
+                if (String.IsNullOrEmpty(input)) { input = ""; }
                 if (this.Actions.ContainsKey(input)) { this.Actions[input]?.Invoke(); return true; }
                 if (this.Triggers.ContainsKey(input)) { StepForward(this.Triggers[input]); return true; }
                 if (input.Equals("/help") || input.Equals("/?")) {
@@ -71,19 +71,18 @@ namespace MTLibrary {
             }
             public String GetHelp() {
                 StringBuilder help = new();
-                foreach (KeyValuePair<string, Action> h in this.Actions) {
+                foreach (KeyValuePair<String, Action> h in this.Actions) {
                     _ = help.Append($"\n\t[{h.Key}]");
                 }
                 return help.ToString();
             }
-            public string GetChoices() {
+            public String GetChoices() {
                 StringBuilder choices = new();
-                foreach (KeyValuePair<string, Menu> t in this.Triggers) {
+                foreach (KeyValuePair<String, Menu> t in this.Triggers) {
                     if (!t.Value.Locked) {
                         _ = choices.AppendLine($"[{t.Key}] -> {t.Value.Title} ({t.Value.Description})");
                     }
-                }
-                return choices.ToString();
+                } return choices.ToString();
             }
             public void StepBack() {
                 if (this.LastMenu == null || this.Locked) { return; }

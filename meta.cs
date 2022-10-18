@@ -5,9 +5,9 @@ namespace MTLibrary {
     public static class Meta {
         public static readonly String Projectname = "MTLibrary";
         public static readonly String Author = "MTadder";
-        public static readonly String Email = "MTadder@protonmail.com";
-        public static readonly String Codename = "beendid";
-        public static readonly ConsoleColor ColorCode = ConsoleColor.Green;
+        public static readonly String Email = "MTadder@pm.me";
+        public static readonly String Codename = "izu x taey";
+        public static readonly ConsoleColor ColorCode = ConsoleColor.Cyan;
 
         public static String MetaInformation() {
             return $"{Projectname} _{Codename}_ <{Author} @ {Email}>";
@@ -28,13 +28,11 @@ namespace MTLibrary {
                 } else if (arrEnum.Current.GetType().IsSerializable) {
                     serial += $"{arrEnum.Current}{seperator}";
                 } else {
-                    throw new ArrayTypeMismatchException(nameof(target) +
-                        " is not serializable!");
-                }
-                index++;
+                    throw new ArrayTypeMismatchException($"object '{nameof(target)}' is not serializable!");
+                } index++;
             }
             serial = serial.Substring(0, serial.Length - 2);
-            return serial.Trim() + "}";
+            return $"{serial.Trim()}{'}'}"; // } must be escaped with a {'}'}
         }
     }
 }

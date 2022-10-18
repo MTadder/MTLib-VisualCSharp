@@ -3,19 +3,33 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace MTLibrary {
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class DictionaryFile {
         #region Internals
-        internal static Boolean HasExtension(String inStr, String ext) {
-            return String.IsNullOrEmpty(inStr) is not true && inStr.Contains($".{ext}");
+        /// <summary>
+        /// Checks if a filename has a certain extension.
+        /// </summary>
+        /// <param name="fileName">file name to test for extension</param>
+        /// <param name="ext">extension to search for</param>
+        /// <returns>a <see cref="Boolean">Bool</see></returns>
+        internal static Boolean HasExtension(String fileName, String ext) {
+            return String.IsNullOrEmpty(fileName) is not true && fileName.Contains($".{ext}");
         }
-        internal static String GetAnonymousFilename(String ext = "bin", Int32 iteration = 0) {
-            if (iteration >= Int32.MaxValue) { throw new OverflowException(); }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ext"></param>
+        /// <param name="iteration"></param>
+        /// <returns></returns>
+        internal static String GetAnonymousFilename(String ext = "bin") {
             String name = $"{Guid.NewGuid()}.{ext}";
             name = name.Replace('-', '0');
-            return File.Exists(name) ? GetAnonymousFilename(ext, iteration+1) : name;
+            return File.Exists(name) ? GetAnonymousFilename(ext) : name;
         }
         #endregion
-
         #region Constructors
         public DictionaryFile() {
             this._memory = new();
@@ -37,7 +51,6 @@ namespace MTLibrary {
             this.Load();
         }
         #endregion
-
         #region Properties
         private Dictionary<String, String> _memory;
         private Boolean _inSync = false;
@@ -67,9 +80,7 @@ namespace MTLibrary {
                 if (value is not null) { this.Set(key, value); } else { _ = this.Remove(key); }
             }
         }
-        public static implicit operator Dictionary<String, String>(DictionaryFile df) {
-            return new(df._memory);
-        }
+        public static implicit operator Dictionary<String, String>(DictionaryFile df) { return new(df._memory); }
         public static explicit operator DictionaryFile(Dictionary<String, String> pairs) {
             DictionaryFile df = new();
             df._memory = pairs;
@@ -104,7 +115,6 @@ namespace MTLibrary {
             return df1;
         }
         #endregion
-
         #region Methods
         public void Save() {
             if (this.Count is 0) {

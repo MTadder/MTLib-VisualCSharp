@@ -3,7 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace MTLibrary {
+    /// <summary>
+    /// Secure Encapsulatations and Implementations for Data Transmission/Transmutation
+    /// </summary>
     public static class Secure {
+        /// <summary>
+        /// Represents a trustworthy <see cref="_keyset">keyset</see> holder and/or verifier
+        /// </summary>
         public class Authenticator {
             internal List<String> _keyset = new();
             internal Salt _salt = new();
@@ -35,17 +41,14 @@ namespace MTLibrary {
             public void Register(Single key) {
                 this.Register(key.ToString());
             }
-            public void Register(Double key) {
+            public void Register(System.Double key) {
                 this.Register(key.ToString());
             }
-            public Boolean IsRegistered(String query) {
-                String hashedQuery = this.Hash(query);
+            public Boolean IsRegistered(String query, Boolean doHash=true) {
+                String hashedQuery = doHash ? this.Hash(query) : query;
                 foreach (String key in this._keyset) {
-                    if (key.Equals(hashedQuery)) {
-                        return true;
-                    }
-                }
-                return false;
+                    if (key.Equals(hashedQuery)) { return true; }
+                } return false;
             }
             public DictionaryFile Persist(DictionaryFile into) {
                 Int32 idx = 0;
