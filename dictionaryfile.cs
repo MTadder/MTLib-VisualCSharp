@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
 
 namespace MTLibrary {
@@ -31,35 +32,32 @@ namespace MTLibrary {
         }
         #endregion
         #region Constructors
+        public DictionaryFile(DictionaryFile origin) {
+            this._memory = new(origin._memory);
+            this._targetInfo = new(origin._targetInfo.Name);
+            this.Load();
+        }
+        public DictionaryFile(String fName) {
+            this._memory = new();
+            this._targetInfo = new(fName);
+            this.Load();
+        }
         public DictionaryFile() {
             this._memory = new();
             this._targetInfo = new(GetAnonymousFilename());
             this.Load();
         }
-        public DictionaryFile(DictionaryFile origin) {
-            this._memory = new(origin._memory);
-            this._targetInfo = origin._targetInfo;
-        }
-        public DictionaryFile(DictionaryFile origin, String name) {
-            this._memory = new(origin._memory);
-            this._targetInfo = new(name);
-            this.Load();
-        }
-        public DictionaryFile(String name) {
-            this._memory = new();
-            this._targetInfo = new(name);
-            this.Load();
-        }
         #endregion
         #region Properties
         private Dictionary<String, String> _memory;
-        private Boolean _inSync = false;
+        private Boolean _inSync;
         private FileInfo _targetInfo;
+        private Int32 BytesTransferred;
         public Int32 Count { get { return this._memory.Count; } }
         public Boolean IsSynchronized { get { return this._inSync; } }
         public String FileName {
             get { this._targetInfo.Refresh(); return this._targetInfo.Name; }
-            set { 
+            set {
                 if (value is null) {
                     _ = this.Delete();
                 } else {
@@ -93,7 +91,7 @@ namespace MTLibrary {
                     try {
                         String key = pairs[i];
                         try {
-                            String val = pairs[i+1];
+                            String val = pairs[i + 1];
                             df.Set(key, val);
                         } catch { throw; }
                     } catch { throw; }
@@ -118,8 +116,7 @@ namespace MTLibrary {
         #region Methods
         public void Save() {
             if (this.Count is 0) {
-                _ = this.Delete();
-                this._inSync = true;
+                this._inSync = this.Delete();
                 return;
             }
             if (this._inSync is false) {
@@ -131,9 +128,11 @@ namespace MTLibrary {
                             binWriter.Write(explorer.Current.Key);
                             binWriter.Write(explorer.Current.Value);
                         }
+                        binWriter.Flush();
+                        this.BytesTransferred += (Int32) targetStream.Length;
+                        binWriter.Close();
                     }
-                }
-                this._inSync = true;
+                } this._inSync = true;
             }
         }
         /// <summary>
@@ -144,30 +143,34 @@ namespace MTLibrary {
         /// <returns><see cref="void"/></returns>
         public void Load() {
             this._targetInfo.Refresh();
-            using (FileStream targetStream = this._targetInfo.Open(FileMode.OpenOrCreate, FileAccess.Read)) {
-                Int32 len = (Int32) targetStream.Length;
-                if (len < 13) {
-                    this._inSync = this.Count.Equals(0);
-                    return;
-                }
-                Byte[] targetData = new Byte[len];
-                _ = targetStream.Read(targetData);
-                using (MemoryStream memStream = new(targetData)) {
-                    using (BinaryReader binReader = new(memStream)) {
-                        Int32 pairsToRead = binReader.ReadInt32();
-                        for (Int32 i = 0; i < pairsToRead; i++) {
-                            try {
-                                String gotKey = binReader.ReadString();
+            try {
+                using (FileStream targetStream = this._targetInfo.Open(FileMode.OpenOrCreate, FileAccess.Read)) {
+                    Int32 len = (Int32) targetStream.Length;
+                    if (len < 13) {
+                        this._inSync = this.Count.Equals(0);
+                        return; // stop short if no content is to be written
+                    }
+                    this.BytesTransferred += len;
+                    Byte[] targetData = new Byte[len];
+                    _ = targetStream.Read(targetData);
+                    using (MemoryStream memStream = new(targetData)) {
+                        using (BinaryReader binReader = new(memStream)) {
+                            Int32 pairsToRead = binReader.ReadInt32();
+                            for (Int32 i = 0; i < pairsToRead; i++) {
                                 try {
-                                    String gotValue = binReader.ReadString();
-                                    this._memory[gotKey] = gotValue;
+                                    String gotKey = binReader.ReadString();
+                                    try {
+                                        String gotValue = binReader.ReadString();
+                                        this._memory[gotKey] = gotValue;
+                                    } catch { continue; }
                                 } catch { continue; }
-                            } catch { continue; }
+                            }
+                            this._inSync = this.Count.Equals(pairsToRead);
+                            binReader.Close();
                         }
-                        this._inSync = this.Count.Equals(pairsToRead);
                     }
                 }
-            }
+            } catch { throw; }
         }
         public void Clear() {
             this._memory.Clear();
@@ -178,12 +181,17 @@ namespace MTLibrary {
         }
         public void Set(String key) {
             this.Set(key, String.Empty);
+            this._inSync = false;
         }
         public Boolean Remove(String key) {
             Boolean rem = this._memory.Remove(key);
-            this._inSync = rem;
+            this._inSync = rem is false; // good logic
             return rem;
         }
+        /// <summary>
+        /// Deletes the DF from Storage.
+        /// </summary>
+        /// <returns>true, if the DF was properly deleted from the disk</returns>
         public Boolean Delete() {
             this._targetInfo.Refresh();
             if (this._targetInfo.Exists) {
@@ -211,7 +219,7 @@ namespace MTLibrary {
         public Boolean IsValue(String value) {
             var explorer = this._memory.GetEnumerator();
             while (explorer.MoveNext()) {
-                if (explorer.Current.Value.Equals(value)) { return true; }
+                if (explorer.Current.Value.Equals(value, StringComparison.Ordinal)) { return true; }
             }
             return false;
         }

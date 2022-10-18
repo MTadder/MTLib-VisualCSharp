@@ -82,7 +82,8 @@ namespace MTLibrary {
                     if (!t.Value.Locked) {
                         _ = choices.AppendLine($"[{t.Key}] -> {t.Value.Title} ({t.Value.Description})");
                     }
-                } return choices.ToString();
+                }
+                return choices.ToString();
             }
             public void StepBack() {
                 if (this.LastMenu == null || this.Locked) { return; }

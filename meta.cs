@@ -29,7 +29,8 @@ namespace MTLibrary {
                     serial += $"{arrEnum.Current}{seperator}";
                 } else {
                     throw new ArrayTypeMismatchException($"object '{nameof(target)}' is not serializable!");
-                } index++;
+                }
+                index++;
             }
             serial = serial.Substring(0, serial.Length - 2);
             return $"{serial.Trim()}{'}'}"; // } must be escaped with a {'}'}

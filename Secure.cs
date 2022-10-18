@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MTLibrary {
     /// <summary>
@@ -13,7 +12,7 @@ namespace MTLibrary {
         public class Authenticator {
             internal List<String> _keyset = new();
             internal Salt _salt = new();
-            public Salt Salt { 
+            public Salt Salt {
                 get { return this._salt; }
                 set { this._salt = value; }
             }
@@ -30,7 +29,8 @@ namespace MTLibrary {
                 String[] hashedKeys = new String[keys.Length];
                 for (Int32 i = 0; i < keys.Length; i++) {
                     hashedKeys[i] = this.Hash(keys[i]);
-                } this._keyset.AddRange(hashedKeys);
+                }
+                this._keyset.AddRange(hashedKeys);
             }
             public void Register(List<String> keys) {
                 this.Register(keys.ToArray());
@@ -44,11 +44,12 @@ namespace MTLibrary {
             public void Register(System.Double key) {
                 this.Register(key.ToString());
             }
-            public Boolean IsRegistered(String query, Boolean doHash=true) {
+            public Boolean IsRegistered(String query, Boolean doHash = true) {
                 String hashedQuery = doHash ? this.Hash(query) : query;
                 foreach (String key in this._keyset) {
                     if (key.Equals(hashedQuery)) { return true; }
-                } return false;
+                }
+                return false;
             }
             public DictionaryFile Persist(DictionaryFile into) {
                 Int32 idx = 0;
