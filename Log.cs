@@ -1,0 +1,5 @@
+﻿namespace MTLib {
+    class Log {
+
+    }
+}
