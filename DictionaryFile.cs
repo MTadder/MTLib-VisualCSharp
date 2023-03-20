@@ -38,14 +38,7 @@ namespace MTLibrary {
         public DictionaryFile(string targetPath = "") {
             this._target=string.IsNullOrEmpty(targetPath) ?
                 new(Path.GetTempFileName()) : new(targetPath);
-            //this.Read();
         }
-        //public DictionaryFile(DictionaryFile<T, Q> df) {
-        //    this._target=df._target;
-        //    this._memory=df._memory;
-        //    this._synced=false;
-        //    //this.Read();
-        //}
         #endregion
         #region Methods
         public bool Validate() {
