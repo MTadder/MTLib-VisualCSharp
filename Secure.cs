@@ -63,8 +63,8 @@
             }
         }
         public class Salt {
-            internal char[] _salt;
-            internal static char[] GenerateSegments(Int32 amount) {
+            protected internal char[] _salt;
+            protected internal static char[] GenerateSegments(Int32 amount) {
                 static char[] GenerateSegment() {
                     return Guid.NewGuid().ToString().Replace("-", "").ToCharArray();
                 }
@@ -86,9 +86,6 @@
             public Salt(string salt) {
                 this._salt=salt.ToCharArray();
             }
-            //public override string ToString() {
-            //return Meta.Serialize(this._salt, "", false).Trim();
-            //}
             public string Hash(string data) {
                 string result = "";
                 for (int dataCharIdx = 0; dataCharIdx<data.Length; dataCharIdx++) {

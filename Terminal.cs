@@ -6,7 +6,7 @@ namespace MTLibrary {
         public static async void TypeWrite(string msg, int maxInterval, ConsoleColor col = ConsoleColor.White) {
             foreach (char c in msg.ToCharArray()) {
                 Put(c.ToString(), col);
-                if (!char.IsWhiteSpace(c)) {
+                if (char.IsWhiteSpace(c).Equals(false)) {
                     await Task.Delay(RandomNumberGenerator.GetInt32(maxInterval));
                 }
             }
@@ -31,7 +31,7 @@ namespace MTLibrary {
             public Dictionary<string, Action> Actions = new();
             #endregion
             #region Internals
-            internal Menu? LastMenu;
+            protected internal Menu? LastMenu;
             #endregion
             #region Constructors
             public Menu(string title, string description, bool isLocked = false) {
@@ -42,19 +42,31 @@ namespace MTLibrary {
             #endregion
             #region Methods
             public bool Prompt() {
-                Draw();
+                this.Draw();
                 string? input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input)) { input=""; }
-                if (this.Actions.ContainsKey(input)) { this.Actions[input]?.Invoke(); return true; }
-                if (this.Triggers.ContainsKey(input)) { StepForward(this.Triggers[input]); return true; }
+                if (string.IsNullOrEmpty(input)) { return false; }
+                bool called = false;
+                foreach (KeyValuePair<string, Action> pair in this.Actions) {
+                    if (pair.Key.Equals(input)) {
+                        pair.Value.Invoke();
+                        called = true;
+                    }
+                }
+                if (called) return true;
+                foreach (KeyValuePair<string, Menu> pair in this.Triggers) {
+                    if (pair.Key.Equals(input)) {
+                        this.StepForward(pair.Value);
+                        return true;
+                    }
+                }
                 if (input.Equals("/help")||input.Equals("/?")) {
                     Write($"Actions:");
-                    Write(GetHelp(), ConsoleColor.Gray);
+                    Write(this.GetHelp(), ConsoleColor.Gray);
                     Write("\nPress [ENTER] to continue.", ConsoleColor.Gray);
                     _=Console.ReadLine();
                     return true;
                 }
-                if (input.Equals("/b")) { StepBack(); return true; }
+                if (input.Equals("/b")) { this.StepBack(); return true; }
                 Write($"{this.InvalidTriggerMsg} Type [/b] to go back.", ConsoleColor.DarkRed);
                 Console.Beep();
                 Thread.Sleep(1000);
@@ -63,7 +75,7 @@ namespace MTLibrary {
             public void Draw() {
                 Console.Clear();
                 Write($"\t\t{this.Title}\n", ConsoleColor.Cyan);
-                Write($"{GetChoices()}\n", ConsoleColor.DarkGreen);
+                Write($"{this.GetChoices()}\n", ConsoleColor.DarkGreen);
                 Write(this.Carriage, ConsoleColor.Green);
             }
             public string GetHelp() {
@@ -91,7 +103,7 @@ namespace MTLibrary {
             public void StepForward(Menu nextMenu) {
                 if (this.Locked) { return; }
                 nextMenu.Locked=false;
-                this.LastMenu=(Menu) this.MemberwiseClone();
+                this.LastMenu=this;
                 (this.Title, this.Description)=(nextMenu.Title, nextMenu.Description);
                 this.Triggers=nextMenu.Triggers;
                 this.Actions=nextMenu.Actions;
