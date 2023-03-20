@@ -13,7 +13,6 @@
             for (int i = 0; i<tuple.Length; i++) {
                 yield return tuple[i];
             }
-            Tron.Net.Client.WalletAddress walletAddress = Tron.Net.Client.WalletAddress.MainNetWalletAddress();
         }
     }
 }
