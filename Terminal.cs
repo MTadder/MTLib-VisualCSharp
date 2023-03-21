@@ -1,29 +1,40 @@
-﻿using System.Security.Cryptography;
+﻿using System.Drawing;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MTLibrary {
     public static class Terminal {
-        public static async void TypeWrite(string msg, int maxInterval, ConsoleColor col = ConsoleColor.White) {
+        public static async void TypeWrite(string msg, int maxInterval) {
             foreach (char c in msg.ToCharArray()) {
-                Put(c.ToString(), col);
+                PrintChar(c);
                 if (char.IsWhiteSpace(c).Equals(false)) {
                     await Task.Delay(RandomNumberGenerator.GetInt32(maxInterval));
                 }
             }
         }
-        public static void Write(string msg, ConsoleColor col = ConsoleColor.White) {
-            TypeWrite(msg, 2, col);
+        public static void PrintChar(char ch) {
+            Console.Write(ch);
         }
-        public static void Put(string msg, ConsoleColor col = ConsoleColor.White) {
-            ConsoleColor lastCol = Console.ForegroundColor;
-            Console.ForegroundColor=col;
+        public static void PrintString(string msg) {
             Console.Write(msg);
-            Console.ForegroundColor=lastCol;
         }
         public class Menu {
+            public class Style {
+                protected internal ConsoleColor last_fg;
+                protected internal ConsoleColor last_bg;
+                public ConsoleColor foreground = ConsoleColor.White;
+                public ConsoleColor background = ConsoleColor.Black;
+                public Style() { }
+                public void Push() { }
+                public void Pop() { }
+            }
             #region Properties
-            public string Title;
-            public string Description;
+            public Style MasterStyle;
+            public Style PromptStyle;
+            public bool TypeWriterEnabled;
+            public int TypeWriterWaitMS;
+            public string Title = "";
+            public string Description = "";
             public string InvalidTriggerMsg = "Invalid operation.";
             public string Carriage = ">: ";
             public bool Locked;
@@ -34,16 +45,32 @@ namespace MTLibrary {
             protected internal Menu? LastMenu;
             #endregion
             #region Constructors
-            public Menu(string title, string description, bool isLocked = false) {
+            public Menu(string title, string description = "", bool isLocked = false) {
                 this.Title=title;
                 this.Description=description;
                 this.Locked=isLocked;
             }
+            public Menu() { }
             #endregion
             #region Methods
+            public void Print(string msg) {
+                ConsoleColor fgColor = Console.ForegroundColor;
+                ConsoleColor bgColor = Console.BackgroundColor;
+                Console.ForegroundColor=this.MasterStyle.foreground;
+                Console.BackgroundColor=this.MasterStyle.background;
+                if (this.TypeWriterEnabled) {
+                    TypeWrite(msg, this.TypeWriterWaitMS);
+                } else { PrintString(msg); }
+                (Console.ForegroundColor, Console.BackgroundColor) = (fgColor, bgColor);
+            }
             public bool Prompt() {
                 this.Draw();
+                ConsoleColor fgColor = Console.ForegroundColor;
+                ConsoleColor bgColor = Console.BackgroundColor;
+                Console.ForegroundColor=this.PromptStyle.foreground;
+                Console.BackgroundColor=this.PromptStyle.background;
                 string? input = Console.ReadLine();
+                (Console.ForegroundColor, Console.BackgroundColor)=(fgColor, bgColor);
                 if (string.IsNullOrEmpty(input)) { return false; }
                 bool called = false;
                 foreach (KeyValuePair<string, Action> pair in this.Actions) {
@@ -60,23 +87,23 @@ namespace MTLibrary {
                     }
                 }
                 if (input.Equals("/help")||input.Equals("/?")) {
-                    Write($"Actions:");
-                    Write(this.GetHelp(), ConsoleColor.Gray);
-                    Write("\nPress [ENTER] to continue.", ConsoleColor.Gray);
+                    Print($"Actions:");
+                    Print(this.GetHelp());
+                    Print("\nPress [ENTER] to continue.");
                     _=Console.ReadLine();
                     return true;
                 }
                 if (input.Equals("/b")) { this.StepBack(); return true; }
-                Write($"{this.InvalidTriggerMsg} Type [/b] to go back.", ConsoleColor.DarkRed);
+                Print($"{this.InvalidTriggerMsg} Type [/b] to go back.");
                 Console.Beep();
                 Thread.Sleep(1000);
                 return false;
             }
             public void Draw() {
                 Console.Clear();
-                Write($"\t\t{this.Title}\n", ConsoleColor.Cyan);
-                Write($"{this.GetChoices()}\n", ConsoleColor.DarkGreen);
-                Write(this.Carriage, ConsoleColor.Green);
+                Print($"\t\t{this.Title}\n\t{this.Description}\n");
+                Print($"{this.GetChoices()}\n");
+                Print(this.Carriage);
             }
             public string GetHelp() {
                 StringBuilder help = new();
@@ -89,7 +116,7 @@ namespace MTLibrary {
                 StringBuilder choices = new();
                 foreach (KeyValuePair<string, Menu> t in this.Triggers) {
                     if (!t.Value.Locked) {
-                        _=choices.AppendLine($"[{t.Key}] -> {t.Value.Title} ({t.Value.Description})");
+                        _=choices.AppendLine($"[{t.Key}] -> {t.Value.Title}");
                     }
                 }
                 return choices.ToString();
@@ -103,7 +130,7 @@ namespace MTLibrary {
             public void StepForward(Menu nextMenu) {
                 if (this.Locked) { return; }
                 nextMenu.Locked=false;
-                this.LastMenu=this;
+                this.LastMenu=(Menu) this.MemberwiseClone();
                 (this.Title, this.Description)=(nextMenu.Title, nextMenu.Description);
                 this.Triggers=nextMenu.Triggers;
                 this.Actions=nextMenu.Actions;

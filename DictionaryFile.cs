@@ -44,22 +44,21 @@ namespace MTLibrary {
         public bool Validate() {
             using FileStream fStr = this._target.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite);
             using BinaryReader bReader = new(fStr);
-            bool hasMemory = this.Memory.Count>0;
-            return bReader.PeekChar().Equals(-1) ?
-                hasMemory.Equals(false) : this.Memory.Count.Equals(bReader.ReadInt32());
+            try { return this.Memory.Count.Equals(bReader.ReadInt32()); } catch { return false; }
         }
         public void Save() {
             if (this._synced) return;
-            using FileStream fStr = this._target.Open(FileMode.Truncate, FileAccess.Write, FileShare.Write);
+            FileStream fStr = this._target.Exists.Equals(false) ?
+                this._target.Create() : this._target.Open(FileMode.Truncate, FileAccess.Write, FileShare.Write);
             using BinaryWriter bWriter = new(fStr);
-            var explorer = this._memory.GetEnumerator();
             bWriter.Write(this._memory.Count);
+            var explorer = this._memory.GetEnumerator();
             while (explorer.MoveNext()) {
                 string key = JsonSerializer.Serialize<T>(explorer.Current.Key);
                 string val = JsonSerializer.Serialize<Q>(explorer.Current.Value);
                 bWriter.Write(key); bWriter.Write(val);
             }
-            this.BytesWritten+=(int) fStr.Length;
+            this.BytesWritten+=(int) bWriter.Seek(0, SeekOrigin.End);
             this._synced=true;
         }
         public void Read() {
