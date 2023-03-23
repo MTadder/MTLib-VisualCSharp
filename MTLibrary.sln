@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTLibrary", "MTLibrary.csproj", "{96906FA4-A86C-461F-8FFE-E2F8EB22A292}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTLibraryTests", "..\MTLibraryTests\MTLibraryTests.csproj", "{890794AC-B9CC-40FA-87C4-CB16EC78EF94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTLibraryTests", "..\MTLibraryTests\MTLibraryTests.csproj", "{890794AC-B9CC-40FA-87C4-CB16EC78EF94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,8 +13,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96906FA4-A86C-461F-8FFE-E2F8EB22A292}.Release|Any CPU.Build.0 = Release|Any CPU
 		{890794AC-B9CC-40FA-87C4-CB16EC78EF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
