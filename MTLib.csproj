@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<Version>0.1.2</Version>
+	<Version>0.1.3</Version>
 	<Authors>MTadder</Authors>
 	<Title>MTLibrary</Title>
 	<Product>MTLibrary</Product>
@@ -15,7 +15,8 @@
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<IncludeSymbols>True</IncludeSymbols>
-	<AnalysisLevel>latest-recommended</AnalysisLevel>
+	<AnalysisLevel>latest-all</AnalysisLevel>
+	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
