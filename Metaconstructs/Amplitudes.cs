@@ -3,5 +3,4 @@ public class Amplitude {
     public Amplitude(Flavor dynamic) {
 
     }
-
 }
