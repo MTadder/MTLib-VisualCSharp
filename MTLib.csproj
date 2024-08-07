@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<Version>0.1.3</Version>
+	<!--
+		ver. format: major.minor.build.revision
+	-->
+	<AssemblyVersion>0.1.0.0</AssemblyVersion>
+	<Version>0.1.4.0</Version>
 	<Authors>MTadder</Authors>
+	<Company>MTLaboratory</Company>
 	<Title>MTLibrary</Title>
 	<Product>MTLibrary</Product>
 	<Description>a general-purpose Modern Toolset Library</Description>
@@ -15,12 +20,40 @@
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<IncludeSymbols>True</IncludeSymbols>
-	<AnalysisLevel>latest-all</AnalysisLevel>
+	<AnalysisLevel>latest-recommended</AnalysisLevel>
 	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+	<AssemblyName>MTLibrary</AssemblyName>
+	<RootNamespace>MTLib</RootNamespace>
+	<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+	<ApplicationIcon>icon.ico</ApplicationIcon>
+	<PackageId>MTLib</PackageId>
+	<PackageIcon>icon.png</PackageIcon>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<RepositoryUrl>https://github.com/MTadder/MTLib-VisualCSharp</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
