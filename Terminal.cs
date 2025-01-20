@@ -1,5 +1,6 @@
 ﻿using System.Security;
 using System.Security.Cryptography;
+
 using MenuHook = System.Action<MTLib.Terminal.Menu, System.String?>;
 
 namespace MTLib;
@@ -10,12 +11,12 @@ public static class Terminal {
         void WriteLine(String text);
         void Clear();
     }
-    public sealed class NormalConsoleWriter : IConsoleWriter {
+    public sealed class NormalConsoleWriter: IConsoleWriter {
         public void Write(String text) => Console.Write(text);
         public void WriteLine(String text) => Console.WriteLine(text);
         public void Clear() => Console.Clear();
     }
-    public sealed class TypewriterConsoleWriter : IConsoleWriter {
+    public sealed class TypewriterConsoleWriter: IConsoleWriter {
         public (Int32 min, Int32 max) WaitRange = (5, 64);
         public TypewriterConsoleWriter(Int32 minCharWait, Int32 maxCharWait) {
             this.WaitRange = (minCharWait, maxCharWait);

@@ -18,7 +18,16 @@ public sealed class Salt {
     public Salt(Salt target) => this._data = target._data;
     public Salt(Char[] data) => this._data = data;
     public Salt(String salt) => this._data = salt.ToCharArray();
-
+    public override String ToString() => new(this._data);
+    public override Boolean Equals(Object? obj) {
+        if (obj is Salt target) {
+            return this._data.SequenceEqual(target._data);
+        }
+        if (obj is String salt) {
+            return this._data.SequenceEqual(salt.ToCharArray());
+        }
+        return false;
+    }
     public String Hash(String data) {
         String result = "";
         for (Int32 char_idx = 0; char_idx < data.Length; char_idx++) {

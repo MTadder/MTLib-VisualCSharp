@@ -1,6 +1,13 @@
 ﻿using System.Text.Json;
 
 namespace MTLib.Secure;
+/// <summary>
+/// A generic class that manages a dictionary of key-value
+/// pairs, allowing for temporary storage and synchronization with a file, 
+/// while providing functionality to revert changes and track read/write operations.
+/// </summary>
+/// <typeparam name="T1">Key type</typeparam>
+/// <typeparam name="T2">Value type</typeparam>
 public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
         where T1 : notnull {
     private Dictionary<T1, T2> revertMemory = [];
@@ -13,8 +20,8 @@ public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
         TargetFileInfo = targetFileInfo;
     }
 
-    public DictionaryFile(string? targetPath = null) {
-        TargetFileInfo = !string.IsNullOrEmpty(targetPath) ?
+    public DictionaryFile(String? targetPath = null) {
+        TargetFileInfo = !String.IsNullOrEmpty(targetPath) ?
             new(targetPath) : new(Path.GetTempFileName());
     }
 
@@ -28,15 +35,15 @@ public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
     public T2 this[T1 key] {
         get { return Memory[key]; }
         set {
-            if (Memory.TryGetValue(key, out T2? oldValue))
+            if (Memory.TryGetValue(key, out T2? oldValue)) {
                 revertMemory[key] = oldValue;
+            }
             Memory[key] = value;
             Synced = false;
         }
     }
     public void Save() {
-        if (Synced)
-            return;
+        if (Synced) { return; }
         FileStream fStr = TargetFileInfo.Exists.Equals(false) ?
             TargetFileInfo.Create() : TargetFileInfo.Open(FileMode.Truncate, FileAccess.Write, FileShare.Write);
         using BinaryWriter bWriter = new(fStr);
@@ -48,12 +55,12 @@ public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
             bWriter.Write(key);
             bWriter.Write(val);
         }
-        BytesWritten += (int) bWriter.Seek(0, SeekOrigin.End);
+        BytesWritten += ((int) bWriter.Seek(0, SeekOrigin.End));
         Synced = true;
     }
     public void Read() {
         using FileStream fStr = TargetFileInfo.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        int len = (int) fStr.Length;
+        int len = ((int) fStr.Length);
         if (len.Equals(0) && Memory.Count.Equals(0)) {
             Synced = true;
             return;
@@ -70,4 +77,6 @@ public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
         }
         Synced = Memory.Count.Equals(pairs);
     }
+
+    public Boolean HasKey(T1 key) => Memory.ContainsKey(key);
 }

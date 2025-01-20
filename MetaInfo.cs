@@ -1,5 +1,5 @@
 ﻿namespace MTLib;
 public static class MetaInfo {
-    public static readonly String VersionString = "Kloe";
-    public static readonly String VersionNumber = "0.1.3";
+    public static readonly String VersionString = "Criminogenic";
+    public static readonly String VersionNumber = "0.1.4";
 }
