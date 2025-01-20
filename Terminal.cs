@@ -32,6 +32,7 @@ public static class Terminal {
                 this.WaitRange.min, this.WaitRange.max);
         }
         public void Write(String text) {
+            ArgumentNullException.ThrowIfNull(text);
             foreach (Char current in text) {
                 Console.Write(current);
                 Thread.Sleep(this._GetWaitMS());
@@ -60,14 +61,15 @@ public static class Terminal {
         /// Instantiates a new <see cref="Style"/>, with default parameters.
         /// </summary>
         public Style() { }
+
         public Style(ConsoleColor? fg = null, ConsoleColor? bg = null) {
             this.Foreground = fg ?? this.Foreground;
             this.Background = bg ?? this.Background;
         }
+
         /// <summary>
         /// Applies this <see cref="Style"/> to the <see cref="Console"/>.
         /// </summary>
-        /// <param name="style">The <see cref="Style"/> to apply.</param>
         /// <returns>The previous <see cref="Style"/> that was being used.</returns>
         public Style Push() {
             Style oldStyle = new(Console.ForegroundColor, Console.BackgroundColor);

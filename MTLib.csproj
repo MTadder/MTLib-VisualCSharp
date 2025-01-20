@@ -8,8 +8,8 @@
 	<!--
 		ver. format: major.minor.build.revision
 	-->
-	<AssemblyVersion>0.1.0.0</AssemblyVersion>
-	<Version>0.1.4.0</Version>
+	<AssemblyVersion></AssemblyVersion>
+	<Version>0.1.5.0</Version>
 	<Authors>MTadder</Authors>
 	<Company>MTLaboratory</Company>
 	<Title>MTLibrary</Title>
@@ -20,7 +20,7 @@
 	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<IncludeSymbols>True</IncludeSymbols>
-	<AnalysisLevel>latest-recommended</AnalysisLevel>
+	<AnalysisLevel>latest-all</AnalysisLevel>
 	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 	<AssemblyName>MTLibrary</AssemblyName>
 	<RootNamespace>MTLib</RootNamespace>
@@ -33,10 +33,16 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <WarningLevel>9999</WarningLevel>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <WarningLevel>9999</WarningLevel>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
