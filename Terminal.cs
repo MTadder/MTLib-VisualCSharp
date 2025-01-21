@@ -82,13 +82,17 @@ public static class Terminal {
         /// <see cref="Style"/>.
         /// </summary>
         /// <param name="msg">The <see cref="String"/> to write.</param>
-        /// <param name="style">The <see cref="Style"/> to use whilst writing.</param>
+        /// <param name="writer">The <see cref="IConsoleWriter"/> to use for writing.</param>
         public void Write(String msg, IConsoleWriter writer) {
+            ArgumentNullException.ThrowIfNullOrEmpty(msg);
+            writer ??= Writers.NormalConsoleWriter;
             Style old_Style = this.Push();
             writer.Write(msg);
             _ = old_Style.Push();
         }
         public void WriteLine(String msg, IConsoleWriter writer) {
+            ArgumentNullException.ThrowIfNullOrEmpty(msg);
+            writer ??= Writers.NormalConsoleWriter;
             Style old_Style = this.Push();
             writer.WriteLine(msg);
             _ = old_Style.Push();
@@ -100,16 +104,19 @@ public static class Terminal {
         /// </summary>
         /// <param name="style">The <see cref="Style"/> to implicitly cast.</param>
         public static implicit operator (ConsoleColor fg, ConsoleColor bg)(Style style) {
+            ArgumentNullException.ThrowIfNull(style);
             return new(style.Foreground, style.Background);
         }
+
         /// <summary>
         /// Explicitly casts a <see cref="Style"/> from a
         /// <see cref="ConsoleColor"/> <see cref="Tuple"/>.
         /// </summary>
-        /// <param name="tup">The <see cref="Tuple"/> to cast.</param>
+        /// <param name="tuple">The <see cref="Tuple"/> to cast.</param>
         public static explicit operator Style((ConsoleColor fg, ConsoleColor bg) tuple) {
             return new() { Foreground = tuple.fg, Background = tuple.bg };
         }
+
         /// <summary>
         /// Explicitly casts a <see cref="Style"/> from a
         /// <see cref="ConsoleColor"/> instance.
@@ -119,6 +126,16 @@ public static class Terminal {
         public static explicit operator Style(ConsoleColor color) {
             return new(color);
         }
+
+        public (ConsoleColor fg, ConsoleColor bg) ToValueTuple() {
+            throw new NotImplementedException();
+        }
+
+        public static Style ToStyle(Style fg, Style bg) {
+            return new() { Foreground = fg, Background = bg };
+            throw new NotImplementedException();
+        }
+
     }
     public class Menu {
         #region Properties

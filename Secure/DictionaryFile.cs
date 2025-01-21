@@ -8,8 +8,8 @@ namespace MTLib.Secure;
 /// </summary>
 /// <typeparam name="T1">Key type</typeparam>
 /// <typeparam name="T2">Value type</typeparam>
-public sealed class DictionaryFile<T1, T2> // TODO: DOCUMENT
-        where T1 : notnull {
+public sealed class DictionaryFile<T1, T2>
+    where T1 : notnull {
     private Dictionary<T1, T2> revertMemory = [];
 
     public Dictionary<T1, T2> Memory = [];

@@ -9,7 +9,7 @@
 		ver. format: major.minor.build.revision
 	-->
 	<AssemblyVersion></AssemblyVersion>
-	<Version>0.1.5.0</Version>
+	<Version>0.2.6.1</Version>
 	<Authors>MTadder</Authors>
 	<Company>MTLaboratory</Company>
 	<Title>MTLibrary</Title>

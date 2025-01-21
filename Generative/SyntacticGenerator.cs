@@ -5,7 +5,9 @@ namespace MTLib.Generative;
 /// Provides a high level interface for sequential syntax generation.
 /// </summary>
 public sealed class SyntacticGenerator {
-    public SyntacticGenerator() { }
+    public SyntacticGenerator() {
+
+    }
 
     public SyntacticGenerator(String languageName) {
         this.Language = languageName;
@@ -22,7 +24,7 @@ public sealed class SyntacticGenerator {
         get { return language; }
         set { language = value; }
     }
-    private Dictionary<Byte, String> literals = [];
+    private readonly Dictionary<Byte, String> literals = [];
     public Dictionary<Byte, String> Literals {
         get { return literals; }
     }
@@ -48,8 +50,7 @@ public sealed class SyntacticGenerator {
         Byte literal,
         TabType tabType = TabType.MAINTAIN
     ) {
-        ArgumentNullException.ThrowIfNull(
-                Literals[literal], nameof(literal));
+        ArgumentNullException.ThrowIfNull(Literals[literal], nameof(literal));
         Result.Append(TabString + Literals[literal] + "\n");
         switch (tabType) {
             case TabType.MAINTAIN:
@@ -73,8 +74,7 @@ public sealed class SyntacticGenerator {
         Boolean putTab = false,
         TabType tabType = TabType.MAINTAIN
     ) {
-        ArgumentNullException.ThrowIfNull(
-        Literals[literal], nameof(literal));
+        ArgumentNullException.ThrowIfNull(Literals[literal], nameof(literal));
         Result.Append((putTab ? TabString : "") + Literals[literal]);
         switch (tabType) {
             case TabType.MAINTAIN:
