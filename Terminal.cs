@@ -126,16 +126,6 @@ public static class Terminal {
         public static explicit operator Style(ConsoleColor color) {
             return new(color);
         }
-
-        public (ConsoleColor fg, ConsoleColor bg) ToValueTuple() {
-            throw new NotImplementedException();
-        }
-
-        public static Style ToStyle(Style fg, Style bg) {
-            return new() { Foreground = fg, Background = bg };
-            throw new NotImplementedException();
-        }
-
     }
     public class Menu {
         #region Properties
